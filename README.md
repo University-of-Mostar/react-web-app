@@ -34,7 +34,7 @@ Kako bi vidjeli sve dostupne konfiguracijske parametre u templateu možemo iskor
 oc process --parameters -n <projekt> <naziv-templatea>
 ```
 
-Tako recimo za predložak React web aplikacije pokretanjem naredbe `` dobijemo popis parametara:
+Tako recimo za predložak React web aplikacije pokretanjem naredbe `oc process --parameters -n openshift react-web-app-example` dobijemo popis parametara:
 
 ```
 NAME                    DESCRIPTION                                                                  GENERATOR           VALUE
