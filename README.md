@@ -1,68 +1,67 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Template
 
-## Available Scripts
+Template predstavlja set objekata koji se mogu parametrizirati i procesuirati što rezultira kreiranjem njihovih instanci u OKD klasteru. Unutar templatea se može definirati bilo koji objekt, ukoliko korisnik ima odgovarajuće ovlasti za njegovo kreiranje, kao što su deploymenti, servisi, stateful setovi, build konfiguracije i slično.
 
-In the project directory, you can run:
+## Upload templatea
 
-### `npm start`
+Template se definira u okviru JSON ili YAML datoteke te se upload u klaster radi putem CLI-a. Ovakav način isporuke omogućava ponovno upotrebu predloška od strane bilo kojeg korisnika koji ima pristup projektu.
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Naredba za upload templatea u OKD:
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+```
+oc create -f <naziv-datoteke>
+```
 
-### `npm test`
+Ukoliko se template želi koristiti isključivo na jednom projektu, upload se radi korištenjem naredbe:
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```
+oc create -f <naziv-datoteke> -n <naziv-projekta>
+```
 
-### `npm run build`
+## Kreiranje aplikacije kroz web sučelje
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Putem web sučelja moguće je kreirati aplikaciju iz templatea.
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+`Proces`
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. Pozicioniranje u željeni projekt, potom klik na "Add to Project"
+2. Odabir templatea iz kataloga predložaka
+3. Modifikacija postavki u novom prozoru kako bi aplikacija radila prema korisnikovim potrebama
 
-### `npm run eject`
+Kako bi vidjeli sve dostupne konfiguracijske parametre u templateu možemo iskoristiti naredbu:
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```
+oc process --parameters -n <projekt> <naziv-templatea>
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Tako recimo za predložak React web aplikacije pokretanjem naredbe `` dobijemo popis parametara:
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```
+NAME                    DESCRIPTION                                                                  GENERATOR           VALUE
+NAME                    The name assigned to all of the frontend objects defined in this template.                       react-web-app
+NAMESPACE               The OpenShift Namespace where the ImageStream resides.                                           openshift
+MEMORY_LIMIT            Maximum amount of memory the container can use.                                                  512Mi
+SOURCE_REPOSITORY_URL   The source URL for the application                                                               https://github.com/University-of-Mostar/react-web-app
+SOURCE_REPOSITORY_REF   The branch name for the application                                                              main
+SOURCE_REPOSITORY_DIR   The location within the source repo of the application                                           .
+OUTPUT_DIR              The location of the compiled static files from your web apps builder                             build
+YARN_ENABLED            A flag to enable the use of the Yarn package manager                                             true
+GITHUB_WEBHOOK_SECRET   A secret string used to configure the GitHub webhook.                        expression          [a-zA-Z0-9]{40}
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Uređivanje templatea
 
-## Learn More
+Postojeći predlošci unutar OKD klastera mogu se uređivati pomoću narebe:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```
+oc edit template <naziv-templatea>
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Pisanje vlastitih templatea
 
-### Code Splitting
+OKD omogućuje pisanje vlastitih predložaka koji se definiraju kroz YAML datoteku, gdje je ključno navesti `kind: Template`.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+Parametri dopuštaju da vrijednost unesete ili generirate prilikom instalacije samog templatea. Zatim se ta vrijednost zamjenjuje gdje god se parametar poziva. Reference se mogu definirati u bilo kojem polju u polju za popis objekata. Ovo je korisno da navedete naziv hosta ili neku drugu vrijednost specifičnu za korisnika koja je potrebna za prilagodbu predloška.
+Parametri u predlošku se definiraju kao `${NAZIV_PARAMETRA}`.
 
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+Dodatne informacije o pisanju templatea može se pronaći na službenoj [dokumentaciji](https://docs.okd.io/latest/openshift_images/using-templates.html#templates-writing_using-templates).
